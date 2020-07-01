@@ -1123,23 +1123,27 @@ module ActiveRecord
       delegate(*delegate_methods, to: :scope)
 
       private
-        def find_nth_with_limit(index, limit, unsaved_records = self.unsaved_records)
+        def find_nth_with_limit(index, limit, skip_default_ordering = dirty?, unsaved_records = self.unsaved_records)
           load_target if strict_loading?
           super
         end
 
-        def find_nth_from_last(index)
+        def find_nth_from_last(index, skip_default_ordering = dirty?)
           load_target if strict_loading?
 
           if loaded?
             super
           else
-            unsaved_records[-index] || super(unsaved_records.length - index)
+            unsaved_records[-index] || super(unsaved_records.length - index, skip_default_ordering)
           end
         end
 
         def null_scope?
           @association.null_scope?
+        end
+
+        def dirty?
+          @association.dirty?
         end
 
         def strict_loading?

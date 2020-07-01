@@ -310,6 +310,11 @@ module ActiveRecord
         owner.new_record? && !foreign_key_present?
       end
 
+      def dirty?
+        owner.new_record? ||
+          target.any? { |record| record.new_record? || record.changed? }
+      end
+
       private
         # We have some records loaded from the database (persisted) and some that are
         # in-memory (memory). The same record may be represented in the persisted array

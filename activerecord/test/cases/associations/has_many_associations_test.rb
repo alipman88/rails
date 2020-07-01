@@ -2191,15 +2191,16 @@ class HasManyAssociationsTest < ActiveRecord::TestCase
 
     assert_not_predicate author.topics_without_type, :loaded?
 
-    assert_queries(1) do
-      if current_adapter?(:Mysql2Adapter, :SQLite3Adapter)
+    if current_adapter?(:Mysql2Adapter, :SQLite3Adapter)
+      assert_queries 2 do
         assert_equal fourth, author.topics_without_type.first
         assert_equal third, author.topics_without_type.second
       end
-      assert_equal new_topic, author.topics_without_type.last
     end
 
-    assert_predicate author.topics_without_type, :loaded?
+    assert_equal new_topic, author.topics_without_type.last
+
+    assert_not_predicate author.topics_without_type, :loaded?
   end
 
   def test_calling_last_on_existing_record_with_build_should_not_use_query
